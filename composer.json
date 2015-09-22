@@ -1,5 +1,5 @@
 {
-    "name": "Schlunix/hack-pdo",
+    "name": "schlunix/hack-pdo",
     "version": "0.9",
     "description": "Create PDO connections from INI file. HHVM/Hack Strict",
     "keywords": ["hhvm", "hack", "hacklang", "strict", "pdo"],
