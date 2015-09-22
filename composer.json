@@ -4,7 +4,9 @@
     "description": "Create PDO connections from INI file. HHVM/Hack Strict",
     "keywords": ["hhvm", "hack", "hacklang", "strict", "pdo"],
     "require": {
-        "hhvm": ">=3.5.0",
+        "hhvm": ">=3.5.0"
+    },
+    "require-dev": {
         "katzgrau/klogger": "dev-master"
     },
     "license": "WTFPL",
