@@ -1,6 +1,7 @@
 {
-    "name": "Indieteq/PHP-MySQL-PDO-Database-Class",
+    "name": "WhyAllTacos/Hack-MySQL-PDO-Database-Class",
     "require": {
-        "php": ">=5.3.0"
+        "hhvm": ">=3.5.0",
+        "katzgrau/klogger": "dev-master"
     }
 }
