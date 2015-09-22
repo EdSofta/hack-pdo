@@ -4,9 +4,9 @@ namespace Schlunix\Pdo;
  *  DB - A simple database class, converted for Hack Strict implementation, PSR-4 Autoloading
  *
  * @author      Lyle Schlueter. lyle@schlunix.org
- * @git         https://github.com/WhyAllTacos/Hack-MySQL-PDO-Database-Class
+ * @git         https://github.com/WhyAllTacos/hack-pdo
  *
- * @Original author   Author: Vivek Wicky Aswal. (https://twitter.com/#!/VivekWickyAswal)
+ * @Original author (PHP version)  Author: Vivek Wicky Aswal. (https://twitter.com/#!/VivekWickyAswal)
  * @Original git      https://github.com/indieteq/PHP-MySQL-PDO-Database-Class
  *
  */
@@ -26,8 +26,7 @@ class DB<T>
     private bool $isConnected = false;
 
     # @object, Object for logging exceptions
-    private Log $log;
-    private Logger $logger;
+    private ?Logger $logger;
 
     # @bool, executed query successfully
     private bool $success;
@@ -36,6 +35,8 @@ class DB<T>
     private Vector<Map<string, string>> $parameters;
 
     private string $INIFileLocation;
+    
+    
     /**
     *   Default Constructor
     *
@@ -45,17 +46,12 @@ class DB<T>
     */
     public function __construct()
     {
-        $this->log = new Log();
-        //$this->Connect();
         $this->parameters = Vector{};
         $this->sQuery     = null;
         $this->success    = false;
         $this->INIFileLocation = "";
+        $this->logger = null;
         
-        $this->logger = new Logger(__DIR__.'/logs');
-        $this->logger->info('Returned a million search results');
-        $this->logger->error('Oh dear.');
-        $this->logger->debug('Got these users from the Database.');
     } // end constructor
 
     /**
@@ -69,6 +65,17 @@ class DB<T>
     }
     
     /**
+    *    This method sets the location of the log file to write to.
+    *
+    *    @param string $in <location of log file, must be writeable by hhvm user>
+    */
+    public function setLogLocation(string $in): void
+    {
+        $this->logger = new Logger($in);
+        $this->logger->info('Logging started successfully for Schlunix\Pdo\DB');
+    }
+    
+    /**
     *    This method makes connection to the database.
     *
     *    1. Reads the database settings from a ini file.
@@ -78,26 +85,65 @@ class DB<T>
     */
     public function Connect(string $dbName = "-1"): void
     {
-        // if no dbName was given, default to the only section in the INI file,
-        // otherwise we will be looking for the specific dbName
-        $iniSettingsArray = parse_ini_file($this->INIFileLocation, true);
+        // reset the array 
+        $iniSettings = array();
         
-        if ($dbName === "-1") {
-            // default settings, use the first section of the INI file 
-            // get the first key in the associative array 
-            $keys = array_keys($iniSettingsArray);
+        try {
+            // attempt to parse the given INI file 
+            $iniSettingsArray = parse_ini_file($this->INIFileLocation, true);
             
-            // set iniSettings to the array that is the first section of the INI file 
-            $iniSettings = $iniSettingsArray[$keys[0]];
-        } else {
-            // get the db settings for the specific db name 
-            $iniSettings = $iniSettingsArray[$dbName];
+            // make sure there is an array in $iniSettingsArray variable before proceeding
+            if (is_array($iniSettingsArray)) {
+            
+                // if no dbName was given, default to the only section in the INI file,
+                // otherwise we will be looking for the specific dbName
+                if ($dbName === "-1") {
+                    // default settings, use the first section of the INI file 
+                    $keys = array_keys($iniSettingsArray);
+                    
+                    // make sure there are at least 4 settings in the db setting array for the
+                    // selected db, this is the minimum required for a successful connection 
+                    if (count($iniSettingsArray[$keys[0]]) >= 4) {
+                        // set iniSettings to the array that is the first section of the INI file 
+                        // that is the first key in the associative array 
+                        $iniSettings = $iniSettingsArray[$keys[0]];
+                    } else {
+                        // log error and die 
+                        if (!is_null($this->logger)) {
+                            $this->logger->critical('Check DB INI. Not enough parameters to make DB connection with default settings "' . $keys[0] . '"');
+                        }
+                        die();
+                    }
+                } elseif (array_key_exists($dbName, $iniSettingsArray)) {
+                    // if the $dbName exists in the INI file
+                    // get the db settings for the specific db name 
+                    $iniSettings = $iniSettingsArray[$dbName];
+                } else {
+                    // log error and die 
+                    if (!is_null($this->logger)) {
+                        $this->logger->critical('Check DB INI. There are no settings given for requested DB "' . $dbName . '"');
+                    }
+                    die();
+                }
+            } else {
+                // log error and die 
+                if (!is_null($this->logger)) {
+                    $this->logger->critical('Check DB INI. No settings found in ' . $this->INIFileLocation);
+                }
+                die();
+            }    
+                
+        } catch (\Exception $e) {
+            if (!is_null($this->logger)) {
+                $this->logger->critical('Caught exception while attempting to process DB settings INI file: ' . $e->getMessage());
+            }
+            die();
         }
         
-        $dsn = 'mysql:dbname=' . $iniSettings["dbname"] . ';host=' . $iniSettings["host"].'';
-        try
-        {
-            # Read settings from INI file, set UTF8
+        try {
+            $dsn = 'mysql:dbname=' . $iniSettings["dbname"] . ';host=' . $iniSettings["host"].'';
+            
+            # Create PDO object from settings, set UTF8
             $local_pdo = new \PDO($dsn,
                                   $iniSettings["user"],
                                   $iniSettings["password"],
@@ -115,10 +161,11 @@ class DB<T>
             # Connection succeeded, set the boolean to true.
             $this->isConnected = true;
         }
-        catch (\PDOException $e)
-        {
+        catch (\PDOException $e) {
             # Write into log
-            echo $this->ExceptionLog($e->getMessage());
+            if (!is_null($this->logger)) {
+                $this->logger->critical($e->getMessage());
+            }
             die();
         }
     } // end function
@@ -193,7 +240,12 @@ class DB<T>
             catch(\PDOException $e)
             {
                     # Write into log and display Exception
-                    echo $this->ExceptionLog($e->getMessage(), $query );
+                    if (!is_null($this->logger)) {
+                        $this->logger->critical($e->getMessage());
+                    }
+                    if (!is_null($this->logger)) {
+                        $this->logger->info($query);
+                    }
                     die();
             } // end catch block
         } // end if local_pdo is not null
@@ -333,28 +385,6 @@ class DB<T>
             // if there was no query to execute, return null
             return null;
         }
-    } // end function
-
-    
-    /**
-    * Writes the log and returns the exception
-    *
-    * @param  string $message
-    * @param  string $sql
-    * @return string
-    */
-    private function ExceptionLog(string $message , ?string $sql = null): string
-    {
-        $exception  = "Unhandled Exception. <br /> $message <br /> You can find the error back in the log.";
-
-        if (!is_null($sql)) {
-            # Add the Raw SQL to the Log
-            $message .= "\r\nRaw SQL : "  . $sql;
-        }
-            # Write into log
-            $this->log->write($message);
-
-        return $exception;
     } // end function
 
 } // end class
