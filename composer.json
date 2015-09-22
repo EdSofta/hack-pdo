@@ -7,7 +7,7 @@
         "hhvm": ">=3.5.0",
         "katzgrau/klogger": "dev-master"
     },
-    "license": "BEER",
+    "license": "WTFPL",
     "authors": [
         {
             "name": "Lyle Schlueter",
