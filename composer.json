@@ -1,7 +1,23 @@
 {
-    "name": "WhyAllTacos/Hack-MySQL-PDO-Database-Class",
+    "name": "WhyAllTacos/hack-pdo",
+    "version": "0.9",
+    "description": "Create PDO connections from INI file. HHVM/Hack Strict",
+    "keywords": ["hhvm", "hack", "hacklang", "strict", "pdo"],
     "require": {
         "hhvm": ">=3.5.0",
         "katzgrau/klogger": "dev-master"
+    },
+    "license": "BEER",
+    "authors": [
+        {
+            "name": "Lyle Schlueter",
+            "email": "lyle@schlunix.org"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Schlunix\\Pdo\\": "src/"
+        },
+        "classmap": ["src/"]
     }
 }

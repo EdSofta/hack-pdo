@@ -1,14 +1,17 @@
 <?hh // strict
 namespace Schlunix\Pdo;
 /**
- *  DB - A simple database class
+ *  DB - A simple database class, converted for Hack Strict implementation, PSR-4 Autoloading
  *
- * @author        Author: Vivek Wicky Aswal. (https://twitter.com/#!/VivekWickyAswal)
- * @git         https://github.com/indieteq/PHP-MySQL-PDO-Database-Class
- * @version      0.2ab
+ * @author      Lyle Schlueter. lyle@schlunix.org
+ * @git         https://github.com/WhyAllTacos/Hack-MySQL-PDO-Database-Class
+ *
+ * @Original author   Author: Vivek Wicky Aswal. (https://twitter.com/#!/VivekWickyAswal)
+ * @Original git      https://github.com/indieteq/PHP-MySQL-PDO-Database-Class
  *
  */
-require("Log.hh");
+
+use Katzgrau\KLogger\Logger;
 
 class DB<T>
 {
@@ -24,6 +27,7 @@ class DB<T>
 
     # @object, Object for logging exceptions
     private Log $log;
+    private Logger $logger;
 
     # @bool, executed query successfully
     private bool $success;
@@ -47,6 +51,11 @@ class DB<T>
         $this->sQuery     = null;
         $this->success    = false;
         $this->INIFileLocation = "";
+        
+        $this->logger = new Logger(__DIR__.'/logs');
+        $this->logger->info('Returned a million search results');
+        $this->logger->error('Oh dear.');
+        $this->logger->debug('Got these users from the Database.');
     } // end constructor
 
     /**
