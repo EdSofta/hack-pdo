@@ -5,7 +5,7 @@
     "keywords": ["hhvm", "hack", "hacklang", "strict", "pdo"],
     "require": {
         "hhvm": ">=3.5.0",
-        "katzgrau/klogger": "dev-master"
+        "katzgrau/klogger": ">=1.0.0"
     },
     "require-dev": {   
     },
