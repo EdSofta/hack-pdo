@@ -13,7 +13,7 @@ namespace Schlunix\Pdo;
 
 use Katzgrau\KLogger\Logger;
 
-class DB<T>
+class DB
 {
     # @object, PDO object
     # Must be nullable because CloseConnection sets it to null
