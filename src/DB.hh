@@ -12,6 +12,7 @@ namespace Schlunix\Pdo;
  */
 
 use Katzgrau\KLogger\Logger;
+use Psr\Log\LogLevel;
 
 class DB
 {
@@ -69,9 +70,20 @@ class DB
     *
     *    @param string $in <location of log file, must be writeable by hhvm user>
     */
-    public function setLogLocation(string $in): void
+    public function setLogLocation(string $in = "./", string $level = LogLevel::INFO, array<string, string> $options = array()): void
     {
-        $this->logger = new Logger($in);
+        $this->logger = new Logger($in, $level, $options);
+        $this->logger->info('Logging started successfully for Schlunix\Pdo\DB');
+    }
+    
+    /**
+    *    This method sets the logger used by the class to a Klogger object.
+    *
+    *    @param Logger $in, a Logger object (Klogger)
+    */
+    public function setLogger(Logger $in): void
+    {
+        $this->logger = $in;
         $this->logger->info('Logging started successfully for Schlunix\Pdo\DB');
     }
     
@@ -329,10 +341,16 @@ class DB
                 
             } else {
                 // no query type, so return null to get out
+                if (!is_null($this->logger)) {
+                    $this->logger->warning(__METHOD__ . 'Unknown query type');
+                }
                 return null;
             }
         } else {
             // $local_sQuery was null, so nothing to do, return null
+            if (!is_null($this->logger)) {
+                $this->logger->warning(__METHOD__ . 'No query given');
+            }
             return null;
         } // end if $local_sQuery is not null
     } // end function
