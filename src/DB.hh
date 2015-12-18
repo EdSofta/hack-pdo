@@ -7,7 +7,7 @@ namespace Schlunix\Pdo;
  * @git         https://github.com/WhyAllTacos/hack-pdo
  *
  * @Original author (PHP version)  Author: Vivek Wicky Aswal. (https://twitter.com/#!/VivekWickyAswal)
- * @Original git      https://github.com/indieteq/PHP-MySQL-PDO-Database-Class
+ * @Original git    https://github.com/indieteq/PHP-MySQL-PDO-Database-Class
  *
  */
 
@@ -51,7 +51,7 @@ class DB
         $this->sQuery     = null;
         $this->success    = false;
         $this->INIFileLocation = "";
-        $this->logger = null;
+        $this->logger     = null;
         
     } // end constructor
 
