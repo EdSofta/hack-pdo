@@ -3,48 +3,54 @@ PDO Database Class
 
 A database class for PHP-MySQL which uses the PDO extension.
 
-If you have any questions go to : http://indieteq.com/index/readmore/how-to-prevent-sql-injection-in-php
-
 ## To use the class
 #### 1. Edit the database settings in the settings.ini.php
-### Note if PDO is loading slow change localhost to -> 127.0.0.1 !
-```
-[SQL]
-host = 127.0.0.1
-user = root
-password = 
-dbname = yourdatabase
-```
+##### You can include as many database settings groups as you want in this file as long as they each have a unique name.
+
+    [SQL]
+    host = 127.0.0.1
+    user = root
+    password = secret
+    dbname = yourdatabase
+
 #### 2. Require the class in your project
-```php
-<?php
-require("Db.class.php");
-```
-#### 3. Create the instance 
-```php
-<?php
-// The instance
-$db = new Db();
-```
-#### 4.  Logs - Modify the read/write rights of the root folder
+I highly recommend using a PSR-4 autoloader. There is a Composer file included in this project for just such a case.
+The DB class is written in hack strict, so it can be included without errors in other strict code
 
-Everytime an exception is thrown by the database class a log file gets created or modified.
-These logs are stored in the logs directory. Which means the database class needs write access for the logs folder.
-If the files are on a webserver you'll have to modify the rights of the root folder otherwise you'll get a "Permission denied" error.
+    <?hh //strict
+    require("DB.hh");
+    
+If you are autoloading, include the namespace and class, no require needed
 
-The log file is a simple plain text file with the current date('year-month-day') as filename.
+    <?hh //strict
+    use Schlunix\Pdo\DB;
+
+#### 3. Create a new DB object
+    <?hh //strict
+    // Instantiate the class
+    $db = new DB();
+
+#### 4.  Logs
+
+This project's logging functionality is built around Klogger. If your calling script already has a Klogger object you can simply pass it to the DB class using:
+    
+    $db->setLogger(yourLoggerObject);
+
+If you do not already have a Klogger object from the calling script, you can create one in the DB class using:
+
+    $db->setLogLocation(String logLocation, String logLevel, array<Klogger options>);
 
 ## Examples
-Below some examples of the basic functions of the database class. I've included a SQL dump so you can easily test the database
-class functions. 
+Below some examples of the basic functions of the database class.
 #### The persons table 
-| id | firstname | lastname | sex | age
-|:-----------:|:------------:|:------------:|:------------:|:------------:|
-| 1       |        John |     Doe    | M | 19
-| 2       |        Bob  |     Black    | M | 41
-| 3       |        Zoe  |     Chan    | F | 20
-| 4       |        Kona |     Khan    | M | 14
-| 5       |        Kader|     Khan    | M | 56
+
+    | id | firstname   | lastname    | sex | age |
+    |:--:|:-----------:|:-----------:|:---:|:---:|
+    | 1  |    John     |     Doe     | M   | 19  |
+    | 2  |    Bob      |     Black   | M   | 41  |
+    | 3  |    Zoe      |     Chan    | F   | 20  |
+    | 4  |    Kona     |     Khan    | M   | 14  |
+    | 5  |    Kader    |     Khan    | M   | 56  |
 
 #### Fetching everything from the table
 ```php
